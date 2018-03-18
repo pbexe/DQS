@@ -1,3 +1,4 @@
+import pickle
 import tkinter as tk
 from tkinter import font as tkfont
 
@@ -68,7 +69,6 @@ class StartPage(tk.Frame):
         tk (obj): Tkinter frame object
     """
 
-
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -87,7 +87,6 @@ class Question(tk.Frame):
     Args:
         tk (obj): Tkinter frame object
     """
-
 
     def __init__(self, parent, controller, question, type, *args):
         tk.Frame.__init__(self, parent)
