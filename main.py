@@ -1,6 +1,12 @@
 import tkinter as tk
 from tkinter import font as tkfont
 
+from classes.admin import Admin
+from classes.result import Overall_Results, Result
+from classes.answer import Picture_Answer, Text_Answer
+from classes.school import School, Student, Year_Group
+from classes.question import Picture_Question, Text_Question
+
 # Frame switcher based off of code retreived from https://stackoverflow.com/questions/7546050/switch-between-two-frames-in-tkinter
 
 
