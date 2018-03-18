@@ -13,6 +13,7 @@ class Question:
 
 class Picture_Question(Question):
     def __init__(self):
+        super.__init__()
         self.__correct_answer = None
         self.__incorrect_answers = []
 
@@ -35,6 +36,7 @@ class Picture_Question(Question):
 
 class Text_Question(Question):
     def __init__(self):
+        super.__init__()
         self.__correct_answer = None
         self.__incorrect_answers = []
 
