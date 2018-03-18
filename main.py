@@ -11,7 +11,6 @@ class App(tk.Tk):
         tk (obj): The tkinter class that the app inherits from
     """
 
-
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.title_font = tkfont.Font(
