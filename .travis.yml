@@ -3,7 +3,5 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-install:
-  - pip install pep8
 script:
-  - pep8 .
+  - python -m py_compile main.py
