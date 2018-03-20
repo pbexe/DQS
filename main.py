@@ -1,7 +1,10 @@
+import os
 import pickle
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import font as tkfont
 
+from classes.quiz import Quiz
 from classes.admin import Admin
 from classes.result import Overall_Results, Result
 from classes.answer import Picture_Answer, Text_Answer
@@ -32,6 +35,18 @@ class App(tk.Tk):
         self.frames['start'] = start
         start.grid(row=0, column=0, sticky="nsew")
 
+        self.questions = []
+        self.LOAD_FILE = "data.quiz"
+        if os.path.exists(self.LOAD_FILE):
+            pickle.load(open(self.LOAD_FILE, "rb"))
+        else:
+            query = messagebox.askyesno("No file", "There is no quiz file. Would you like to create a new one?")
+            if query == "yes":
+                pass # Open question editor
+            else:
+                self.destroy()
+
+
         # for F in (StartPage, PageOne, PageTwo):
         #     page_name = F.__name__
         #     frame = F(parent=container, controller=self)
@@ -49,6 +64,8 @@ class App(tk.Tk):
         """
 
         print("Quiz starting")
+
+        quiz = Quiz()
 
     def show_frame(self, page_name):
         """Changes which page is being displayed
@@ -81,7 +98,7 @@ class StartPage(tk.Frame):
         start_button.pack()
 
 
-class Question(tk.Frame):
+class QuestionView(tk.Frame):
     """The page that a question is displayed on
 
     Args:
