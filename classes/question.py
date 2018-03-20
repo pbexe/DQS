@@ -1,6 +1,6 @@
 class Question:
-    def __init__(self):
-        self.__question_text = None
+    def __init__(self, text):
+        self.__question_text = text
 
     @property
     def question_text(self):
@@ -12,10 +12,10 @@ class Question:
 
 
 class Picture_Question(Question):
-    def __init__(self):
+    def __init__(self, correct, incorrect):
         super.__init__()
-        self.__correct_answer = None
-        self.__incorrect_answers = []
+        self.__correct_answer = correct
+        self.__incorrect_answers = incorrect
 
     @property
     def correct_answer(self):
@@ -35,10 +35,10 @@ class Picture_Question(Question):
 
 
 class Text_Question(Question):
-    def __init__(self):
+    def __init__(self, correct, incorrect):
         super.__init__()
-        self.__correct_answer = None
-        self.__incorrect_answers = []
+        self.__correct_answer = correct
+        self.__incorrect_answers = incorrect
 
     @property
     def correct_answer(self):

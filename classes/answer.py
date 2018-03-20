@@ -1,5 +1,5 @@
 class Answer:
-    pass
+    __correct = None
 
 
 class Picture_Answer(Answer):
