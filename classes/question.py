@@ -12,8 +12,8 @@ class Question:
 
 
 class Picture_Question(Question):
-    def __init__(self, correct, incorrect):
-        super.__init__()
+    def __init__(self, text, correct, incorrect):
+        super.__init__(text)
         self.__correct_answer = correct
         self.__incorrect_answers = incorrect
 
@@ -35,8 +35,8 @@ class Picture_Question(Question):
 
 
 class Text_Question(Question):
-    def __init__(self, correct, incorrect):
-        super.__init__()
+    def __init__(self, text, correct, incorrect):
+        super.__init__(text)
         self.__correct_answer = correct
         self.__incorrect_answers = incorrect
 
