@@ -31,18 +31,24 @@ class App(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
+        self.questions = []
         start = StartPage(parent=container, controller=self)
         self.frames['start'] = start
         start.grid(row=0, column=0, sticky="nsew")
 
-        self.questions = []
+        editor = Editor(parent=container, controller=self)
+        self.frames['editor'] = editor
+        editor.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame("start")
+
         self.LOAD_FILE = "data.quiz"
         if os.path.exists(self.LOAD_FILE):
             pickle.load(open(self.LOAD_FILE, "rb"))
         else:
             query = messagebox.askyesno("No file", "There is no quiz file. Would you like to create a new one?")
-            if query == "yes":
-                pass # Open question editor
+            if query == True:
+                self.show_frame("editor")
             else:
                 self.destroy()
 
@@ -57,7 +63,6 @@ class App(tk.Tk):
         #     # will be the one that is visible.
         #     frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("start")
 
     def start_quiz(self):
         """Starts the quiz
@@ -94,8 +99,25 @@ class StartPage(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         start_button = tk.Button(self, text="Begin Quiz",
-                            command=lambda: controller.start_quiz())
+                                 command=lambda: controller.start_quiz())
         start_button.pack()
+
+
+class Editor(tk.Frame):
+    """The question editor
+
+    Args:
+        tk (obj): Tkinter frame object
+    """
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="Question Editor",
+                         font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
+        for question in controller.questions:
+            pass  # write each question
 
 
 class QuestionView(tk.Frame):
