@@ -53,17 +53,6 @@ class App(tk.Tk):
                 self.destroy()
 
 
-        # for F in (StartPage, PageOne, PageTwo):
-        #     page_name = F.__name__
-        #     frame = F(parent=container, controller=self)
-        #     self.frames[page_name] = frame
-
-        #     # put all of the pages in the same location;
-        #     # the one on the top of the stacking order
-        #     # will be the one that is visible.
-        #     frame.grid(row=0, column=0, sticky="nsew")
-
-
     def start_quiz(self):
         """Starts the quiz
         """
