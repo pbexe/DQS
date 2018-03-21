@@ -1,6 +1,7 @@
 import os
 import pickle
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font as tkfont
 
@@ -48,7 +49,7 @@ class App(tk.Tk):
             pickle.load(open(self.LOAD_FILE, "rb"))
         else:
             query = messagebox.askyesno("No file", "There is no quiz file. Would you like to create a new one?")
-            if query == True:
+            if query is True:
                 self.show_frame("editor")
             else:
                 self.destroy()
@@ -59,7 +60,6 @@ class App(tk.Tk):
         """
 
         print("Quiz starting")
-
         quiz = Quiz()
 
     def show_frame(self, page_name):
@@ -69,7 +69,6 @@ class App(tk.Tk):
             page_name (str): The key of the page that is going to be displayed
         """
 
-        '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -88,7 +87,7 @@ class StartPage(tk.Frame):
                          font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        start_button = tk.Button(self, text="Begin Quiz",
+        start_button = ttk.Button(self, text="Begin Quiz",
                                  command=lambda: controller.start_quiz())
         start_button.pack()
 
@@ -104,11 +103,22 @@ class Editor(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         label = tk.Label(self, text="Question Editor",
-                         font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-        for question in controller.questions:
-            pass  # write each question
+                         font=controller.title_font).grid(row=0)
+        # for question in controller.questions:
+        #     tk.Label(parent, text=question.question_text).pack(
+        #         side="top", fill="x", pady=10)
+            # Add buton to delete the question
+        # e = tk.Entry(parent)
+        # e.pack(side="top", fill="x", pady=10)
+        # e.focus_set()
+        # tk.Label(parent, text="First").grid(row=0)
+        # tk.Label(parent, text="Second").grid(row=1)
 
+        # e1 = ttk.Entry(parent)
+        # e2 = ttk.Entry(parent)
+
+        # e1.grid(row=0, column=0)
+        # e2.grid(row=1, column=0)
 
 class QuestionView(tk.Frame):
     """The page that a question is displayed on
