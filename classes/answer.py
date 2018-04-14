@@ -21,7 +21,7 @@ class Picture_Answer(Answer):
 
     @answer_image.setter
     def answer_image(self, value):
-        self.answer_image = value
+        self.__answer_image = value
 
 
 class Text_Answer(Answer):
@@ -34,4 +34,4 @@ class Text_Answer(Answer):
 
     @answer_text.setter
     def answer_text(self, value):
-        self.answer_text = value
+        self.__answer_text = value
