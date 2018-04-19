@@ -1,7 +1,7 @@
 class School:
-    def __init__(self, name, year_group):
-        self.__name = name
-        self.__year_group = year_group
+    def __init__(self):
+        self.__name = None
+        self.__year_groups = None
 
     @property
     def name(self):
@@ -12,12 +12,12 @@ class School:
         self.__name = value
 
     @property
-    def year_group(self):
-        return self.__year_group
+    def year_groups(self):
+        return self.__year_groups
 
-    @year_group.setter
-    def year_group(self, value):
-        self.__year_group = value
+    @year_groups.setter
+    def year_groups(self, value):
+        self.__year_groups = value
 
 
 class Year_Group:
@@ -31,3 +31,25 @@ class Year_Group:
     @year.setter
     def year(self, value):
         self.__year = value
+
+
+class Student:
+    def __init__(self, school, year_group):
+        self.__school = school
+        self.__year_group = year_group
+
+    @property
+    def school(self):
+        return self.__school
+
+    @school.setter
+    def school(self, value):
+        self.__school = value
+
+    @property
+    def year_group(self):
+        return self.__year_group
+
+    @year_group.setter
+    def year_group(self, value):
+        self.__year_group = value

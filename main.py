@@ -31,7 +31,7 @@ class App(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        self.state('zoomed')
+        # self.state('zoomed')
         self.frames = {}
         self.questions = []
         start = StartPage(parent=container, controller=self)
@@ -45,15 +45,15 @@ class App(tk.Tk):
         self.show_frame("start")
 
         self.LOAD_FILE = "data.quiz"
+        self.data = None
         if os.path.exists(self.LOAD_FILE):
-            pickle.load(open(self.LOAD_FILE, "rb"))
+            data = pickle.load(open(self.LOAD_FILE, "rb"))
         else:
             query = messagebox.askyesno("No file", "There is no quiz file. Would you like to create a new one?")
             if query is True:
                 self.show_frame("editor")
             else:
                 self.destroy()
-
 
     def start_quiz(self):
         """Starts the quiz
@@ -85,11 +85,11 @@ class StartPage(tk.Frame):
         self.controller = controller
         label = tk.Label(self, text="This is the start page",
                          font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+        label.grid(row=0, column=0)
 
         start_button = ttk.Button(self, text="Begin Quiz",
                                  command=lambda: controller.start_quiz())
-        start_button.pack()
+        start_button.grid(row=1, column=0)
 
 
 class Editor(tk.Frame):
@@ -102,44 +102,43 @@ class Editor(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Question Editor",
-                         font=controller.title_font).grid(row=0)
-        # for question in controller.questions:
-        #     tk.Label(parent, text=question.question_text).pack(
-        #         side="top", fill="x", pady=10)
-            # Add buton to delete the question
-        # e = tk.Entry(parent)
-        # e.pack(side="top", fill="x", pady=10)
-        # e.focus_set()
-        # tk.Label(parent, text="First").grid(row=0)
-        # tk.Label(parent, text="Second").grid(row=1)
-
-        # e1 = ttk.Entry(parent)
-        # e2 = ttk.Entry(parent)
-
-        # e1.grid(row=0, column=0)
-        # e2.grid(row=1, column=0)
-
-class QuestionView(tk.Frame):
-    """The page that a question is displayed on
-
-    Args:
-        tk (obj): Tkinter frame object
-    """
-
-    def __init__(self, parent, controller, question, type, *args):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = tk.Label(self, text="This is the start page",
+        label = tk.Label(self, text="Question editor",
                          font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+        label.grid(row=0, column=0, columnspan=2, sticky="ew")
+        new_question = tk.Entry(controller)
+        new_answer = tk.Entry(controller)
+        new_question.grid(row=1, column=0)
+        new_answer.grid(row=1, column=1)
 
-        button1 = tk.Button(self, text="Go to Page One",
-                            command=lambda: controller.show_frame("PageOne"))
-        button2 = tk.Button(self, text="Go to Page Two",
-                            command=lambda: controller.show_frame("PageTwo"))
-        button1.pack()
-        button2.pack()
+
+        # button1 = tk.Button(self, text="Go to Page One",
+        #                     command=lambda: controller.show_frame("PageOne"))
+        # button2 = tk.Button(self, text="Go to Page Two",
+        #                     command=lambda: controller.show_frame("PageTwo"))
+        # button1.pack()
+        # button2.pack()
+
+
+# class QuestionView(tk.Frame):
+#     """The page that a question is displayed on
+
+#     Args:
+#         tk (obj): Tkinter frame object
+#     """
+
+#     def __init__(self, parent, controller, question, type, *args):
+#         tk.Frame.__init__(self, parent)
+#         self.controller = controller
+#         label = tk.Label(self, text="This is the start page",
+#                          font=controller.title_font)
+#         label.pack(side="top", fill="x", pady=10)
+
+#         button1 = tk.Button(self, text="Go to Page One",
+#                             command=lambda: controller.show_frame("PageOne"))
+#         button2 = tk.Button(self, text="Go to Page Two",
+#                             command=lambda: controller.show_frame("PageTwo"))
+#         button1.pack()
+#         button2.pack()
 
 
 if __name__ == "__main__":
