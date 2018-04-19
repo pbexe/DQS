@@ -12,15 +12,20 @@ from classes.question import Picture_Question, Text_Question
 LOAD_FILE = "data.quiz"
 
 
+def save_data(save_file):
+    pickle.dump(save_file, open(LOAD_FILE, "wb"))
+
+
 def main():
     # If there is a load file
-    if False:  #os.path.exists(LOAD_FILE):
+    if os.path.exists(LOAD_FILE):
         # Load it
         save = pickle.load(open(LOAD_FILE, "rb"))
     else:
         # Otherwise create a new save object and make a new save file for it
         save = Save()
         pickle.dump(save, open(LOAD_FILE, "wb"))
+
     setup(save)
 
 
@@ -29,22 +34,22 @@ def setup(save):
     year = None
     category = None
     print("\nConfig menu")
-    print("===========\n")
+    print("===========")
+    print("To return to this menu, please close the program and then reopen\n")
     while 1:
-        print("Current config:")
+        print("\nCurrent config:")
         if school:
             print("School:     " + school.name)
         else:
             print("School:     Not Selected")
         if year:
-            print("Year-group: " + school.yeargroup)
+            print("Year-group: " + year.year)
         else:
             print("Year-group: Not Selected")
         if category:
             print("Category:   " + category)
         else:
             print("Category:   Not Selected")
-        print("To return to this menu, please close the program and then reopen\n")
         choice = print_menu("Please choose an option", ["Start Quiz", "Set School", "Add School", "Set Year-group", "Add Year-group", "Set Category", "Edit Questions"])
 
         if choice == 0:
@@ -58,20 +63,39 @@ def setup(save):
                 print("There are currently no schools to pick from. Please add a school to continue")
         elif choice == 2:
             name = input("Please enter the school's name: ")
-            school = School()
-            school.name = name
+            school_ = School()
+            school_.name = name
             if save.schools:
-                save.schools = save.schools + school
+                save.schools = save.schools + school_
             else:
-                save.schools = [school]
+                save.schools = [school_]
         elif choice == 3:
-            pass
+            if school:
+                if school.year_groups:
+                    yeargroup_choice = print_menu("Please choose a year-group", [year.year for year in school.year_groups])
+                    year = school.year_groups[yeargroup_choice]
+                else:
+                    print("There are currently no year-groups to pick from with your current choice of school. Please add a yeargroup to continue")
+            else:
+                print("Please set a school before setting a year-group")
         elif choice == 4:
-            pass
+            if save.schools:
+                year_school_choice = print_menu("Please select a school to add a year-group to:", [school.name for school in save.schools])
+                school_to_add_year_to = save.schools[year_school_choice]
+                name = input("Please enter the year-group name: ")
+                year_ = Year_Group(name)
+                if school_to_add_year_to.year_groups:
+                    school_to_add_year_to.year_groups = school_to_add_year_to.year_groups + year_
+                else:
+                    school_to_add_year_to.year_groups = [year_]
+            else:
+                print("Please add a school before adding a year-group")
         elif choice == 5:
             pass
         elif choice == 6:
             pass
+        save_data(save)
+
 
 def print_menu(statement, options):
     """Presents the user with a choice of options and allows the user to pick one
