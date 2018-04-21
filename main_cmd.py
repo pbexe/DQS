@@ -26,7 +26,9 @@ def main():
         save = Save()
         pickle.dump(save, open(LOAD_FILE, "wb"))
 
-    setup(save)
+    school, year, category = setup(save)
+
+    print("Starting quiz with", school, year, category)
 
 
 def setup(save):
@@ -62,10 +64,13 @@ def setup(save):
         else:
             print("Category:   Not Selected")
         choice = print_menu("Please choose an option", ["Start Quiz", "Set School", "Add School", "Set Year-group", "Add Year-group", "Set Category", "Edit Questions"])
+        print()
 
         if choice == 0:
             if school and year and category:
-                pass # Start quiz
+                return school, year, category
+            else:
+                print("Please ensure you have entered a school, year and category")
 
         elif choice == 1:
             if save.schools:
@@ -112,7 +117,7 @@ def setup(save):
             if save.questions:
                 q = []
                 for question in save.questions:
-                    q.append(question.category)
+                    q.append(question.question_category)
                 q = list(set(q))
                 cat = print_menu("Please select a category", q)
                 category = q[cat]
@@ -130,13 +135,22 @@ def question_editor(questions):
         pass
     else:
         questions = []
-    choice = print_menu("Would you like to:", ["Add a question", "Delete a question", "Quit the question editor"])
-    if choice == 0:
-        pass # Add a question
-    elif choice == 1:
-        pass # Delete a question
-    else:
-        return questions
+    while 1:
+        choice = print_menu("Would you like to:", ["Add a question", "Delete a question", "Quit the question editor"])
+        if choice == 0:
+            text = input("Please enter the question: ")
+            correct = input("Please enter the correct answer: ")
+            incorrect = [input("Please enter an incorrect answer: ") for i in range(0,3)]
+            cat = input("Please enter a category: ")
+            questions.append(Text_Question(text, correct, incorrect, cat))
+        elif choice == 1:
+            if len(questions) > 0:
+                choice = print_menu("Please select a question to delete:", [q.question_text for q in questions])
+                del questions[choice]
+            else:
+                print("There are no questions to delete")
+        else:
+            return questions
 
 
 def print_menu(statement, options):
