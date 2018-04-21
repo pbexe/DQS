@@ -1,6 +1,7 @@
 class Question:
-    def __init__(self, text):
+    def __init__(self, text, category):
         self.__question_text = text
+        self.__question_category = category
 
     @property
     def question_text(self):
@@ -9,6 +10,14 @@ class Question:
     @question_text.setter
     def question_text(self, value):
         self.__question_text = value
+
+    @property
+    def question_category(self):
+        return self.__question_category
+
+    @question_category.setter
+    def question_category(self, value):
+        self.__question_category = value
 
 
 class Picture_Question(Question):

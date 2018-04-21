@@ -1,6 +1,6 @@
 class Save:
     def __init__(self):
-        self.__result = None
+        self.__questions = None
         self.__schools = None
         self.__results = None
 
