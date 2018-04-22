@@ -1,9 +1,24 @@
 class Answer:
+    """Base class for all types of answer
+    """
+
     def __init__(self, correct):
+        """Constructor for `Answer`
+
+        Arguments:
+            correct {boolean} -- Whether the answer is correct or not
+        """
+
         self.__correct = correct
 
     @property
     def correct(self):
+        """Returns whether or not the answer is correct
+
+        Returns:
+            boolean -- Whether the answer is correct or not
+        """
+
         return self.__correct
 
     @correct.setter

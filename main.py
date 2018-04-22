@@ -1,9 +1,9 @@
 import os
 import pickle
+import random
 
 from classes.quiz import Quiz
 from classes.save import Save
-from classes.admin import Admin
 from classes.result import Overall_Results, Result
 from classes.answer import Picture_Answer, Text_Answer
 from classes.school import School, Student, Year_Group
@@ -13,10 +13,20 @@ LOAD_FILE = "data.quiz"
 
 
 def save_data(save_file):
+    """Saves the quiz data to a file
+
+    Arguments:
+        save_file {Save} -- A save object containing all of the quiz's data
+    """
+
+    # Uses pickle to dump the object into a byte array and then into a file
     pickle.dump(save_file, open(LOAD_FILE, "wb"))
 
 
 def main():
+    """The main function that is run when the file is run
+    """
+
     # If there is a load file
     if os.path.exists(LOAD_FILE):
         # Load it
@@ -28,7 +38,33 @@ def main():
 
     school, year, category = setup(save)
 
-    print("Starting quiz with", school, year, category)
+    quiz(school, year, category, save)
+
+
+def quiz(school, year, category, save):
+    while 1:
+        student = Student(school, year)
+        questions = []
+        for question in save.questions:
+            if question.question_category == category:
+                questions.append(question)
+        if len(questions) < 10:
+            print("There are not enough questions for a quiz in this category")
+            break
+        else:
+            questions = random.sample(questions, 10)
+        print([question.question_text for question in questions])
+        random.shuffle(questions)
+        for question in questions:
+            print()
+            index = random.randint(0,3)
+            options = question.incorrect_answers
+            options.insert(index, question.correct_answer)
+            choice = print_menu(question.question_text, options)
+            if choice == index:
+                print("Correct")
+            else:
+                print("Incorrect")
 
 
 def setup(save):
@@ -131,6 +167,15 @@ def setup(save):
 
 
 def question_editor(questions):
+    """Creates an easy interface to edit the questions with
+
+    Arguments:
+        questions {list} -- The questions to edit
+
+    Returns:
+        list -- The edited questions
+    """
+
     if questions:
         pass
     else:
