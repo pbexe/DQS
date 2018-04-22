@@ -1,15 +1,20 @@
 import os
+import time
 import pickle
 import random
 
 from classes.quiz import Quiz
 from classes.save import Save
 from classes.result import Overall_Results, Result
-from classes.answer import Picture_Answer, Text_Answer
+from classes.answer import Picture_Answer, Text_Answer, Answer
 from classes.school import School, Student, Year_Group
 from classes.question import Picture_Question, Text_Question
 
 LOAD_FILE = "data.quiz"
+
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def save_data(save_file):
@@ -36,14 +41,15 @@ def main():
         save = Save()
         pickle.dump(save, open(LOAD_FILE, "wb"))
 
+    clear_screen()
     school, year, category = setup(save)
 
+    clear_screen()
     quiz(school, year, category, save)
 
 
 def quiz(school, year, category, save):
     while 1:
-        student = Student(school, year)
         questions = []
         for question in save.questions:
             if question.question_category == category:
@@ -53,18 +59,34 @@ def quiz(school, year, category, save):
             break
         else:
             questions = random.sample(questions, 10)
-        print([question.question_text for question in questions])
+        print_menu("What would you like to do?", ["Start the quiz"])
+        student = Student(school, year)
         random.shuffle(questions)
+        answers = []
         for question in questions:
             print()
-            index = random.randint(0,3)
+            index = random.randint(0, 3)
             options = question.incorrect_answers
             options.insert(index, question.correct_answer)
             choice = print_menu(question.question_text, options)
             if choice == index:
-                print("Correct")
+                answers.append((question, Answer(True)))
+                print("\nCorrect!")
             else:
-                print("Incorrect")
+                answers.append((question, Answer(False)))
+                print("\nIncorrect...")
+                print("The correct answer is:", question.correct_answer)
+        result = Result(answers, student)
+        if save.results:
+            save.results = save.results.append(result)
+        else:
+            save.results = [result]
+        print()
+        print("Congratulations! You scored: " + str(len([answer for answer in answers if answer[1].correct == True])) + "/" + str(len(answers)))
+        print()
+        save_data(save)
+        time.sleep(5)
+        clear_screen()
 
 
 def setup(save):
