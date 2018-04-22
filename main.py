@@ -14,6 +14,9 @@ LOAD_FILE = "data.quiz"
 
 
 def clear_screen():
+    """Clears the screen
+    """
+
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -49,6 +52,16 @@ def main():
 
 
 def quiz(school, year, category, save):
+    """Allows the user to complete the quiz
+
+    Arguments:
+        school {School} -- The school that the quiz is currently set up for
+        year {Year_Group} -- The year-group that the quiz is currently set up
+        for
+        category {str} -- The category that the questions shall be for
+        save {Save} -- The save file that shall be saved to disk
+    """
+
     while 1:
         questions = []
         for question in save.questions:
@@ -66,9 +79,10 @@ def quiz(school, year, category, save):
         for question in questions:
             print()
             index = random.randint(0, 3)
-            options = question.incorrect_answers
+            options = list(question.incorrect_answers)
             options.insert(index, question.correct_answer)
             choice = print_menu(question.question_text, options)
+            clear_screen()
             if choice == index:
                 answers.append((question, Answer(True)))
                 print("\nCorrect!")
@@ -82,7 +96,9 @@ def quiz(school, year, category, save):
         else:
             save.results = [result]
         print()
-        print("Congratulations! You scored: " + str(len([answer for answer in answers if answer[1].correct == True])) + "/" + str(len(answers)))
+        print("Congratulations! You scored: " + str(len(
+            [answer for answer in answers if answer[1].correct is True]
+            )) + "/" + str(len(answers)))
         print()
         save_data(save)
         time.sleep(5)
@@ -93,17 +109,19 @@ def setup(save):
     """The method run at startup to allow configuration of the quiz
 
     Arguments:
-        save {Save} -- An object that holds all the data for the quiz so that everything can be quickly saved
+        save {Save} -- An object that holds all the data for the quiz so that
+        everything can be quickly saved
 
     Returns:
-        tuple -- The school and yeargroup of the person answering the quiz, and the
+        tuple -- The school and yeargroup of the person answering the quiz,
+        and the
     """
 
     school = None
     year = None
     category = None
 
-    print("\nConfig menu")
+    print("Config menu")
     print("===========")
     print("To return to this menu, please close the program and then reopen\n")
 
@@ -121,8 +139,16 @@ def setup(save):
             print("Category:   " + category)
         else:
             print("Category:   Not Selected")
-        choice = print_menu("Please choose an option", ["Start Quiz", "Set School", "Add School", "Set Year-group", "Add Year-group", "Set Category", "Edit Questions"])
+        choice = print_menu("Please choose an option",
+                            ["Start Quiz",
+                             "Set School",
+                             "Add School",
+                             "Set Year-group",
+                             "Add Year-group",
+                             "Set Category",
+                             "Edit Questions"])
         print()
+        clear_screen()
 
         if choice == 0:
             if school and year and category:
@@ -207,7 +233,7 @@ def question_editor(questions):
         if choice == 0:
             text = input("Please enter the question: ")
             correct = input("Please enter the correct answer: ")
-            incorrect = [input("Please enter an incorrect answer: ") for i in range(0,3)]
+            incorrect = [input("Please enter an incorrect answer: ") for i in range(0, 3)]
             cat = input("Please enter a category: ")
             questions.append(Text_Question(text, correct, incorrect, cat))
         elif choice == 1:
