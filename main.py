@@ -219,6 +219,7 @@ def show_stats(save):
 
     while 1:
         choice = print_menu("What would you like to do?", ["Compare year-groups from a school", "Compare schools", "Export to Excel", "Quit stats viewer"])
+        clear_screen()
         if choice == 0:
             years = {}
             if save.schools:
@@ -235,21 +236,21 @@ def show_stats(save):
                                     years[year].append(len(
                                         [answer for answer in answers if answer[1].correct is True]
                                     ))
-                            year_names = []
-                            year_averages = []
-                            for year in years:
-                                years[year] = sum(years[year])/len(years[year])
-                                year_names.append(year)
-                                year_averages.append(years[year])
-                            index = np.arange(len(year_names))
-                            plt.bar(index, year_averages)
-                            plt.xlabel('Year-groups')
-                            plt.ylabel('Average Score')
-                            plt.xticks(index, year_names)
-                            plt.title('Averages for year-groups in ' + school.name)
-                            plt.show()
                         else:
                             print("Please complete at least one quiz")
+                    year_names = []
+                    year_averages = []
+                    for year in years:
+                        years[year] = sum(years[year])/len(years[year])
+                        year_names.append(year)
+                        year_averages.append(years[year])
+                    index = np.arange(len(year_names))
+                    plt.bar(index, year_averages)
+                    plt.xlabel('Year-groups')
+                    plt.ylabel('Average Score')
+                    plt.xticks(index, year_names)
+                    plt.title('Averages for year-groups in ' + school.name)
+                    plt.show()
 
                 else:
                     print("This school has no year-groups")
@@ -288,27 +289,29 @@ def show_stats(save):
             else:
                 print("There are no schools to compare")
         elif choice == 2:
-            workbook = xlsxwriter.Workbook('data.xlsx')
-            worksheet = workbook.add_worksheet()
-            bold = workbook.add_format({'bold': True})
-            worksheet.write('A1', 'School', bold)
-            worksheet.write('B1', 'Year', bold)
-            worksheet.write('C1', 'Category', bold)
-            worksheet.write('D1', 'Result', bold)
-            row = 1
-            col = 0
-            if save.results:
-                for result in save.results:
-                    worksheet.write(row, col, result.student.school.name)
-                    worksheet.write(row, col + 1, result.student.year_group.year)
-                    worksheet.write(row, col + 2, result.result[0][0].question_category)
-                    worksheet.write(row, col + 3, str(len([answer for answer in result.result if answer[1].correct is True])))
-                    row += 1
-                workbook.close()
-                print("Data successfully exported to data.xlsx")
-            else:
-                print("There is no data to export")
-
+            try:
+                workbook = xlsxwriter.Workbook('data.xlsx')
+                worksheet = workbook.add_worksheet()
+                bold = workbook.add_format({'bold': True})
+                worksheet.write('A1', 'School', bold)
+                worksheet.write('B1', 'Year', bold)
+                worksheet.write('C1', 'Category', bold)
+                worksheet.write('D1', 'Result', bold)
+                row = 1
+                col = 0
+                if save.results:
+                    for result in save.results:
+                        worksheet.write(row, col, result.student.school.name)
+                        worksheet.write(row, col + 1, result.student.year_group.year)
+                        worksheet.write(row, col + 2, result.result[0][0].question_category)
+                        worksheet.write(row, col + 3, str(len([answer for answer in result.result if answer[1].correct is True])))
+                        row += 1
+                    workbook.close()
+                    print("Data successfully exported to data.xlsx")
+                else:
+                    print("There is no data to export")
+            except PermissionError:
+                print("Please close the file before attempting to write to it")
         elif choice == 3:
             return
 
