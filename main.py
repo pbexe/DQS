@@ -1,7 +1,10 @@
 import os
+import xlsxwriter
 import time
 import pickle
 import random
+import numpy as np
+import matplotlib.pyplot as plt
 
 from classes.quiz import Quiz
 from classes.save import Save
@@ -45,13 +48,13 @@ def main():
         pickle.dump(save, open(LOAD_FILE, "wb"))
 
     clear_screen()
-    school, year, category = setup(save)
+    category = setup(save)
 
     clear_screen()
-    quiz(school, year, category, save)
+    quiz(category, save)
 
 
-def quiz(school, year, category, save):
+def quiz(category, save):
     """Allows the user to complete the quiz
 
     Arguments:
@@ -63,6 +66,25 @@ def quiz(school, year, category, save):
     """
 
     while 1:
+        school = None
+        year = None
+        if save.schools:
+            school_choice = print_menu("Please choose a school", [
+                                        school.name for school in save.schools])
+            school = save.schools[school_choice]
+        else:
+            print("There are currently no schools to pick from. Please add a school to continue")
+            break
+        if school:
+            if school.year_groups:
+                yeargroup_choice = print_menu(
+                    "Please choose a year-group", [year.year for year in school.year_groups])
+                year = school.year_groups[yeargroup_choice]
+            else:
+                print(
+                    "There are currently no year-groups to pick from with your current choice of school. Please add a yeargroup to continue")
+        else:
+            print("Please set a school before setting a year-group")
         questions = []
         for question in save.questions:
             if question.question_category == category:
@@ -72,7 +94,6 @@ def quiz(school, year, category, save):
             break
         else:
             questions = random.sample(questions, 10)
-        print_menu("What would you like to do?", ["Start the quiz"])
         student = Student(school, year)
         random.shuffle(questions)
         answers = []
@@ -92,7 +113,7 @@ def quiz(school, year, category, save):
                 print("The correct answer is:", question.correct_answer)
         result = Result(answers, student)
         if save.results:
-            save.results = save.results.append(result)
+            save.results = save.results + [result]
         else:
             save.results = [result]
         print()
@@ -117,8 +138,6 @@ def setup(save):
         and the
     """
 
-    school = None
-    year = None
     category = None
 
     print("Config menu")
@@ -127,63 +146,37 @@ def setup(save):
 
     while 1:
         print("\nCurrent config:")
-        if school:
-            print("School:     " + school.name)
-        else:
-            print("School:     Not Selected")
-        if year:
-            print("Year-group: " + year.year)
-        else:
-            print("Year-group: Not Selected")
         if category:
             print("Category:   " + category)
         else:
             print("Category:   Not Selected")
         choice = print_menu("Please choose an option",
                             ["Start Quiz",
-                             "Set School",
                              "Add School",
-                             "Set Year-group",
                              "Add Year-group",
                              "Set Category",
-                             "Edit Questions"])
+                             "Edit Questions",
+                             "View Statistics"])
         print()
         clear_screen()
 
         if choice == 0:
-            if school and year and category:
-                return school, year, category
+            if category:
+                return category
             else:
-                print("Please ensure you have entered a school, year and category")
+                print("Please ensure you have entered a category")
 
         elif choice == 1:
-            if save.schools:
-                school_choice = print_menu("Please choose a school", [school.name for school in save.schools])
-                school = save.schools[school_choice]
-            else:
-                print("There are currently no schools to pick from. Please add a school to continue")
-
-        elif choice == 2:
             name = input("Please enter the school's name: ")
             school_ = School()
             school_.name = name
 
             if save.schools:
-                save.schools = save.schools + school_
+                save.schools = save.schools + [school_]
             else:
                 save.schools = [school_]
 
-        elif choice == 3:
-            if school:
-                if school.year_groups:
-                    yeargroup_choice = print_menu("Please choose a year-group", [year.year for year in school.year_groups])
-                    year = school.year_groups[yeargroup_choice]
-                else:
-                    print("There are currently no year-groups to pick from with your current choice of school. Please add a yeargroup to continue")
-            else:
-                print("Please set a school before setting a year-group")
-
-        elif choice == 4:
+        elif choice == 2:
             if save.schools:
                 year_school_choice = print_menu("Please select a school to add a year-group to:", [school.name for school in save.schools])
                 school_to_add_year_to = save.schools[year_school_choice]
@@ -191,13 +184,13 @@ def setup(save):
                 year_ = Year_Group(name)
 
                 if school_to_add_year_to.year_groups:
-                    school_to_add_year_to.year_groups = school_to_add_year_to.year_groups + year_
+                    school_to_add_year_to.year_groups = school_to_add_year_to.year_groups + [year_]
                 else:
                     school_to_add_year_to.year_groups = [year_]
             else:
                 print("Please add a school before adding a year-group")
 
-        elif choice == 5:
+        elif choice == 3:
             if save.questions:
                 q = []
                 for question in save.questions:
@@ -208,11 +201,119 @@ def setup(save):
             else:
                 print("Please add questions before selecting a category")
 
-        elif choice == 6:
+        elif choice == 4:
             save.questions = question_editor(save.questions)
+
+        elif choice == 5:
+            show_stats(save)
 
         save_data(save)
 
+
+def show_stats(save):
+    """Displays and exports statistics
+
+    Arguments:
+        save {Save} -- Contains all application data
+    """
+
+    while 1:
+        choice = print_menu("What would you like to do?", ["Compare year-groups from a school", "Compare schools", "Export to Excel", "Quit stats viewer"])
+        clear_screen()
+        if choice == 0:
+            years = {}
+            if save.schools:
+                school_choice = print_menu("Please select a school:", [school.name for school in save.schools])
+                school = save.schools[school_choice]
+                if school.year_groups:
+                    for year_group in school.year_groups:
+                        years[year_group.year] = []
+                    for year in years:
+                        if save.results:
+                            for result in save.results:
+                                if result.student.school == school and result.student.year_group.year == year:
+                                    answers = result.result
+                                    years[year].append(len(
+                                        [answer for answer in answers if answer[1].correct is True]
+                                    ))
+                        else:
+                            print("Please complete at least one quiz")
+                    year_names = []
+                    year_averages = []
+                    for year in years:
+                        years[year] = sum(years[year])/len(years[year])
+                        year_names.append(year)
+                        year_averages.append(years[year])
+                    index = np.arange(len(year_names))
+                    plt.bar(index, year_averages)
+                    plt.xlabel('Year-groups')
+                    plt.ylabel('Average Score')
+                    plt.xticks(index, year_names)
+                    plt.title('Averages for year-groups in ' + school.name)
+                    plt.show()
+
+                else:
+                    print("This school has no year-groups")
+            else:
+                print("There are no schools to display")
+        elif choice == 1:
+            school_results = {}
+            if save.schools:
+                for school in save.schools:
+                    if save.results:
+                        for result in save.results:
+                            if result.student.school.name == school.name:
+                                if school.name in school_results:
+                                    school_results[school.name].append(len(
+                                        [answer for answer in result.result if answer[1].correct is True]
+                                    ))
+                                else:
+                                    school_results[school.name] = [(len(
+                                        [answer for answer in result.result if answer[1].correct is True]
+                                    ))]
+                school_names = []
+                school_averages = []
+                for school in school_results:
+                    school_results[school] = sum(school_results[school])/len(school_results[school])
+                    school_names.append(school)
+                    school_averages.append(school_results[school])
+                index = np.arange(len(school_names))
+                plt.bar(index, school_averages)
+                plt.xlabel('Schools')
+                plt.ylabel('Average Score')
+                plt.xticks(index, school_names)
+                plt.title('Averages for schools')
+                plt.show()
+
+
+            else:
+                print("There are no schools to compare")
+        elif choice == 2:
+            try:
+                workbook = xlsxwriter.Workbook('data.xlsx')
+                worksheet = workbook.add_worksheet()
+                bold = workbook.add_format({'bold': True})
+                worksheet.write('A1', 'School', bold)
+                worksheet.write('B1', 'Year', bold)
+                worksheet.write('C1', 'Category', bold)
+                worksheet.write('D1', 'Result', bold)
+                row = 1
+                col = 0
+                if save.results:
+                    for result in save.results:
+                        worksheet.write(row, col, result.student.school.name)
+                        worksheet.write(row, col + 1, result.student.year_group.year)
+                        worksheet.write(row, col + 2, result.result[0][0].question_category)
+                        worksheet.write(row, col + 3, str(len([answer for answer in result.result if answer[1].correct is True])))
+                        row += 1
+                    workbook.close()
+                    print("Data successfully exported to data.xlsx")
+                else:
+                    print("There is no data to export")
+            except PermissionError:
+                print("Please close the file before attempting to write to it")
+        elif choice == 3:
+            return
 
 def question_editor(questions):
     """Creates an easy interface to edit the questions with
