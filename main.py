@@ -2,8 +2,8 @@ import os
 import time
 import pickle
 import random
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 from classes.quiz import Quiz
 from classes.save import Save
@@ -47,13 +47,13 @@ def main():
         pickle.dump(save, open(LOAD_FILE, "wb"))
 
     clear_screen()
-    school, year, category = setup(save)
+    category = setup(save)
 
     clear_screen()
-    quiz(school, year, category, save)
+    quiz(category, save)
 
 
-def quiz(school, year, category, save):
+def quiz(category, save):
     """Allows the user to complete the quiz
 
     Arguments:
@@ -65,6 +65,25 @@ def quiz(school, year, category, save):
     """
 
     while 1:
+        school = None
+        year = None
+        if save.schools:
+            school_choice = print_menu("Please choose a school", [
+                                        school.name for school in save.schools])
+            school = save.schools[school_choice]
+        else:
+            print("There are currently no schools to pick from. Please add a school to continue")
+            break
+        if school:
+            if school.year_groups:
+                yeargroup_choice = print_menu(
+                    "Please choose a year-group", [year.year for year in school.year_groups])
+                year = school.year_groups[yeargroup_choice]
+            else:
+                print(
+                    "There are currently no year-groups to pick from with your current choice of school. Please add a yeargroup to continue")
+        else:
+            print("Please set a school before setting a year-group")
         questions = []
         for question in save.questions:
             if question.question_category == category:
@@ -74,7 +93,6 @@ def quiz(school, year, category, save):
             break
         else:
             questions = random.sample(questions, 10)
-        print_menu("What would you like to do?", ["Start the quiz"])
         student = Student(school, year)
         random.shuffle(questions)
         answers = []
@@ -119,8 +137,6 @@ def setup(save):
         and the
     """
 
-    school = None
-    year = None
     category = None
 
     print("Config menu")
@@ -129,23 +145,13 @@ def setup(save):
 
     while 1:
         print("\nCurrent config:")
-        if school:
-            print("School:     " + school.name)
-        else:
-            print("School:     Not Selected")
-        if year:
-            print("Year-group: " + year.year)
-        else:
-            print("Year-group: Not Selected")
         if category:
             print("Category:   " + category)
         else:
             print("Category:   Not Selected")
         choice = print_menu("Please choose an option",
                             ["Start Quiz",
-                             "Set School",
                              "Add School",
-                             "Set Year-group",
                              "Add Year-group",
                              "Set Category",
                              "Edit Questions",
@@ -154,19 +160,12 @@ def setup(save):
         clear_screen()
 
         if choice == 0:
-            if school and year and category:
-                return school, year, category
+            if category:
+                return category
             else:
-                print("Please ensure you have entered a school, year and category")
+                print("Please ensure you have entered a category")
 
         elif choice == 1:
-            if save.schools:
-                school_choice = print_menu("Please choose a school", [school.name for school in save.schools])
-                school = save.schools[school_choice]
-            else:
-                print("There are currently no schools to pick from. Please add a school to continue")
-
-        elif choice == 2:
             name = input("Please enter the school's name: ")
             school_ = School()
             school_.name = name
@@ -176,17 +175,7 @@ def setup(save):
             else:
                 save.schools = [school_]
 
-        elif choice == 3:
-            if school:
-                if school.year_groups:
-                    yeargroup_choice = print_menu("Please choose a year-group", [year.year for year in school.year_groups])
-                    year = school.year_groups[yeargroup_choice]
-                else:
-                    print("There are currently no year-groups to pick from with your current choice of school. Please add a yeargroup to continue")
-            else:
-                print("Please set a school before setting a year-group")
-
-        elif choice == 4:
+        elif choice == 2:
             if save.schools:
                 year_school_choice = print_menu("Please select a school to add a year-group to:", [school.name for school in save.schools])
                 school_to_add_year_to = save.schools[year_school_choice]
@@ -200,7 +189,7 @@ def setup(save):
             else:
                 print("Please add a school before adding a year-group")
 
-        elif choice == 5:
+        elif choice == 3:
             if save.questions:
                 q = []
                 for question in save.questions:
@@ -211,10 +200,10 @@ def setup(save):
             else:
                 print("Please add questions before selecting a category")
 
-        elif choice == 6:
+        elif choice == 4:
             save.questions = question_editor(save.questions)
 
-        elif choice == 7:
+        elif choice == 5:
             show_stats(save)
 
         save_data(save)
