@@ -211,7 +211,7 @@ def setup(save):
 
 def show_stats(save):
     while 1:
-        choice = print_menu("What would you like to do?", ["Compare year-groups from a school", "Compare schools", "Compare questions", "Export to Excel", "Quit stats viewer"])
+        choice = print_menu("What would you like to do?", ["Compare year-groups from a school", "Compare schools", "Export to Excel", "Quit stats viewer"])
         if choice == 0:
             years = {}
             if save.schools:
@@ -223,39 +223,67 @@ def show_stats(save):
                     for year in years:
                         if save.results:
                             for result in save.results:
-                                print(result)
                                 if result.student.school == school and result.student.year_group.year == year:
                                     answers = result.result
                                     years[year].append(len(
                                         [answer for answer in answers if answer[1].correct is True]
                                     ))
+                            year_names = []
+                            year_averages = []
+                            for year in years:
+                                years[year] = sum(years[year])/len(years[year])
+                                year_names.append(year)
+                                year_averages.append(years[year])
+                            index = np.arange(len(year_names))
+                            plt.bar(index, year_averages)
+                            plt.xlabel('Year-groups')
+                            plt.ylabel('Average Score')
+                            plt.xticks(index, year_names)
+                            plt.title('Averages for year-groups in ' + school.name)
+                            plt.show()
                         else:
                             print("Please complete at least one quiz")
-                    print(school.name, years)
-                    year_names = []
-                    year_averages = []
-                    for year in years:
-                        years[year] = sum(years[year])/len(years[year])
-                        year_names.append(year)
-                        year_averages.append(years[year])
-                    index = np.arange(len(year_names))
-                    plt.bar(index, year_averages)
-                    plt.xlabel('Year-groups')
-                    plt.ylabel('Average Score')
-                    plt.xticks(index, year_names)
-                    plt.title('Averages for year-groups in ' + school.name)
-                    plt.show()
 
                 else:
                     print("This school has no year-groups")
             else:
                 print("There are no schools to display")
         elif choice == 1:
-            pass
+            school_results = {}
+            if save.schools:
+                for school in save.schools:
+                    if save.results:
+                        for result in save.results:
+                            if result.student.school.name == school.name:
+                                if school.name in school_results:
+                                    school_results[school.name].append(len(
+                                        [answer for answer in result.result if answer[1].correct is True]
+                                    ))
+                                else:
+                                    school_results[school.name] = [(len(
+                                        [answer for answer in result.result if answer[1].correct is True]
+                                    ))]
+                school_names = []
+                school_averages = []
+                for school in school_results:
+                    school_results[school] = sum(school_results[school])/len(school_results[school])
+                    school_names.append(school)
+                    school_averages.append(school_results[school])
+                index = np.arange(len(school_names))
+                plt.bar(index, school_averages)
+                plt.xlabel('Schools')
+                plt.ylabel('Average Score')
+                plt.xticks(index, school_names)
+                plt.title('Averages for schools')
+                plt.show()
+
+
+            else:
+                print("There are no schools to compare")
         elif choice == 2:
             pass
         elif choice == 3:
-            pass
+            return
 
 def question_editor(questions):
     """Creates an easy interface to edit the questions with
