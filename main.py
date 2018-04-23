@@ -1,4 +1,5 @@
 import os
+import xlsxwriter
 import time
 import pickle
 import random
@@ -281,7 +282,24 @@ def show_stats(save):
             else:
                 print("There are no schools to compare")
         elif choice == 2:
-            pass
+            workbook = xlsxwriter.Workbook('data.xlsx')
+            worksheet = workbook.add_worksheet()
+            bold = workbook.add_format({'bold': True})
+            worksheet.write('A1', 'School', bold)
+            worksheet.write('B1', 'Year', bold)
+            worksheet.write('C1', 'Category', bold)
+            worksheet.write('D1', 'Result', bold)
+            row = 1
+            col = 0
+            for result in save.results:
+                worksheet.write(row, col, result.student.school.name)
+                worksheet.write(row, col + 1, result.student.year_group.year)
+                worksheet.write(row, col + 2, result.result[0][0].question_category)
+                worksheet.write(row, col + 3, str(len([answer for answer in result.result if answer[1].correct is True])))
+                row += 1
+            workbook.close()
+            print("Data successfully exported to data.xlsx")
+
         elif choice == 3:
             return
 
