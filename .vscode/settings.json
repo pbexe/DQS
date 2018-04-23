@@ -1,3 +1,10 @@
 {
-    "python.pythonPath": "C:\\python36\\python.exe"
+    "python.pythonPath": "C:\\Users\\miles\\Anaconda3\\python.exe",
+    "spellright.language": "en",
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "python"
+    ]
 }

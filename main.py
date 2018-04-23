@@ -2,6 +2,8 @@ import os
 import time
 import pickle
 import random
+import matplotlib.pyplot as plt
+import numpy as np
 
 from classes.quiz import Quiz
 from classes.save import Save
@@ -92,7 +94,7 @@ def quiz(school, year, category, save):
                 print("The correct answer is:", question.correct_answer)
         result = Result(answers, student)
         if save.results:
-            save.results = save.results.append(result)
+            save.results = save.results + [result]
         else:
             save.results = [result]
         print()
@@ -146,7 +148,8 @@ def setup(save):
                              "Set Year-group",
                              "Add Year-group",
                              "Set Category",
-                             "Edit Questions"])
+                             "Edit Questions",
+                             "View Statistics"])
         print()
         clear_screen()
 
@@ -169,7 +172,7 @@ def setup(save):
             school_.name = name
 
             if save.schools:
-                save.schools = save.schools + school_
+                save.schools = save.schools + [school_]
             else:
                 save.schools = [school_]
 
@@ -191,7 +194,7 @@ def setup(save):
                 year_ = Year_Group(name)
 
                 if school_to_add_year_to.year_groups:
-                    school_to_add_year_to.year_groups = school_to_add_year_to.year_groups + year_
+                    school_to_add_year_to.year_groups = school_to_add_year_to.year_groups + [year_]
                 else:
                     school_to_add_year_to.year_groups = [year_]
             else:
@@ -211,8 +214,59 @@ def setup(save):
         elif choice == 6:
             save.questions = question_editor(save.questions)
 
+        elif choice == 7:
+            show_stats(save)
+
         save_data(save)
 
+
+def show_stats(save):
+    while 1:
+        choice = print_menu("What would you like to do?", ["Compare year-groups from a school", "Compare schools", "Compare questions", "Export to Excel", "Quit stats viewer"])
+        if choice == 0:
+            years = {}
+            if save.schools:
+                school_choice = print_menu("Please select a school:", [school.name for school in save.schools])
+                school = save.schools[school_choice]
+                if school.year_groups:
+                    for year_group in school.year_groups:
+                        years[year_group.year] = []
+                    for year in years:
+                        if save.results:
+                            for result in save.results:
+                                print(result)
+                                if result.student.school == school and result.student.year_group.year == year:
+                                    answers = result.result
+                                    years[year].append(len(
+                                        [answer for answer in answers if answer[1].correct is True]
+                                    ))
+                        else:
+                            print("Please complete at least one quiz")
+                    print(school.name, years)
+                    year_names = []
+                    year_averages = []
+                    for year in years:
+                        years[year] = sum(years[year])/len(years[year])
+                        year_names.append(year)
+                        year_averages.append(years[year])
+                    index = np.arange(len(year_names))
+                    plt.bar(index, year_averages)
+                    plt.xlabel('Year-groups')
+                    plt.ylabel('Average Score')
+                    plt.xticks(index, year_names)
+                    plt.title('Averages for year-groups in ' + school.name)
+                    plt.show()
+
+                else:
+                    print("This school has no year-groups")
+            else:
+                print("There are no schools to display")
+        elif choice == 1:
+            pass
+        elif choice == 2:
+            pass
+        elif choice == 3:
+            pass
 
 def question_editor(questions):
     """Creates an easy interface to edit the questions with
